@@ -1,0 +1,96 @@
+body {
+    margin-top: 2%;
+    font-family: 'Quicksand', sans-serif;
+    background:rgb(236, 235, 236);
+    display: block;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    font-weight: 800;
+}
+
+.header {
+    font-family: 'Quicksand', sans-serif;
+    background:rgb(236, 235, 236);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 16pt;
+    font-weight: 800;
+    margin-bottom: 2%;
+}
+
+.form-register {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    block-size: auto;
+    color: rgb(18, 25, 32);
+    font-weight: 800;
+}
+
+.personal-data {
+    padding: 15px;
+}
+
+.personal-data > input {
+    width: 50vw;
+    border: none;
+    border-radius: 10px;
+    padding: 8px;
+    background: rgb(251, 251, 252);
+    color: white;
+    font-size: 12pt;
+    outline: none;
+    box-sizing: border-box;
+    display: block;
+    justify-content: center;
+    align-items: center;
+    block-size: auto;
+}
+
+.gender {
+    width: 50vw;
+    border: none;
+    border-radius: 10px;
+    padding: 8px;
+    background: rgb(251, 251, 252);
+    color: rgb(0, 0, 0);
+    font-size: 12pt;
+    outline: none;
+    box-sizing: border-box;
+    display: block;
+    justify-content: center;
+    align-items: center;
+    block-size: auto;
+}
+
+.btn-register {
+    width: 90%;
+    padding: 16px 0px;
+    margin: 25px;
+    margin-top: 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: none;
+    border-radius: 20px;
+    outline: none;
+    text-transform: uppercase;
+    font-weight: 800;
+    letter-spacing: 1px;
+    color:rgb(248, 248, 248);
+    background: rgb(43, 102, 82);
+    cursor: pointer;
+    box-shadow: 0px 10px 40px -12px #3d3d3d94; 
+}
+
+.login {
+    font-weight: 200;
+    color: rgb(11, 75, 54);
+    margin-top: -10px;
+}
+
