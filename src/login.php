@@ -76,7 +76,6 @@ if(isset($_POST['activate']))
 		{
 			$user = mysqli::fetch_assoc($result);
 
-			$get_user_uname_db = $user['user_id'];
 			$_SESSION['user_id'] = $user['user_id'];
 			setcookie('user_id', $user['user_id'], time() + (365 * 24 * 60 * 60), "/");
 
@@ -137,23 +136,14 @@ if(isset($_POST['activate']))
         </div>
         <div class="right-login">
             <div class="card-login">
-                <?php
-                    if ($activation)
-					{
-                        echo '<h1>Insira o código de ativação.</h1>';
-                    }
-					else 
-					{
-                        echo '<h1>Já possui uma conta?</h1>';
-                    }
-				?>
                 <form class="post-field" method="POST">
 
                     <?php
-                        if ($activation)
+                        if (isset($activation))
 						{
                             echo 
                             '
+								<h1>Insira o código de ativação.</h1>
                                 <div>
                                     <td>
                                         <input name="actcode" placeholder="Activation Code" required="required" class="email signupbox" type="text" size="30" value="'.$acccode.'">
@@ -169,6 +159,7 @@ if(isset($_POST['activate']))
 						{
                             echo 
                             '
+								<h1>Já possui uma conta?</h1>
                                 <div class="text-field">
                                     <label for="email">E-mail:</label>
                                     <input type="text" name="email" placeholder="E-mail">
@@ -181,12 +172,8 @@ if(isset($_POST['activate']))
 
                                 <button name="login" class="btn-login" type="submit">Login</button><br>
 
-                                <a role="button" class="forgotten-password" href="forgotten_password.php" rel="async">Esqueci a senha</a>
-
-                                <form action="singin.php">
-                                    <button class="btn-register" type="submit">Cadastre-se</button>
-                                </form>
-                                
+                                <a role="button" class="forgotten-password" href="forgotten_password.php" rel="async">Esqueci a senha</a>                                
+								<a style="text-decorations:none;" href="sign_in.php" rel="async" class="btn-register">Cadastre-se</a>
                             ';
                         }
 				    ?>
@@ -194,8 +181,7 @@ if(isset($_POST['activate']))
 
                 <div class="signup_error_msg">
                     <?php 
-                        if (isset($error_message)) {echo $error_message;}
-                        
+                        if (isset($error_message)) {echo $error_message;} 
                     ?>
                 </div>
                 
