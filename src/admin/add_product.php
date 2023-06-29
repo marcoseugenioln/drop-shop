@@ -1,21 +1,24 @@
 <?php include ( "../inc/connect.inc.php" ); ?>
+<?php include ( "../utils.php" ); ?>
+
 <?php 
+
 ob_start();
 session_start();
-if (!isset($_SESSION['admin_login'])) {
-	header("location: login.php");
-	$user = "";
+
+if (isset($_SESSION['user_id'])) 
+{
+	$user_id = $_SESSION['user_id'];
+	$user = get_user($con, $user_id);
+
+	$user_first_name = $user['first_name'];
 }
-else {
-	$user = $_SESSION['admin_login'];
-	$result = mysqli_query($con, "SELECT * FROM admin WHERE id='$user'");
-		$get_user_email = mysqli_fetch_assoc($result);
-
-			$uname_db = $get_user_email['firstName'];
-			$utype_db=$get_user_email['type'];			
-
-
+else 
+{
+	header("location: ../login.php");
+	$user_id = "";
 }
+
 $pname = "";
 $price = "";
 $piece="";
@@ -26,52 +29,63 @@ $item = "";
 $pCode = "";
 $descri = "";
 
-if (isset($_POST['signup'])) {
-//declere veriable
-$pname = $_POST['pname'];
-$price = $_POST['price'];
-$piece=$_POST['piece'];
-$available = $_POST['available'];
-$type = $_POST['type'];
-$item = $_POST['item'];
-$pCode = $_POST['code'];
-$descri = $_POST['descri'];
-//triming name
-$_POST['pname'] = trim($_POST['pname']);
+if (isset($_POST['signup'])) 
+{
+	//declere veriable
+	$pname = $_POST['pname'];
+	$price = $_POST['price'];
+	$piece=$_POST['piece'];
+	$available = $_POST['available'];
+	$type = $_POST['type'];
+	$item = $_POST['item'];
+	$pCode = $_POST['code'];
+	$descri = $_POST['descri'];
+	//triming name
+	$_POST['pname'] = trim($_POST['pname']);
 
-//finding file extention
-$profile_pic_name = @$_FILES['profilepic']['name'];
-$file_basename = substr($profile_pic_name, 0, strripos($profile_pic_name, '.'));
-$file_ext = substr($profile_pic_name, strripos($profile_pic_name, '.'));
+	//finding file extention
+	$profile_pic_name = @$_FILES['profilepic']['name'];
+	$file_basename = substr($profile_pic_name, 0, strripos($profile_pic_name, '.'));
+	$file_ext = substr($profile_pic_name, strripos($profile_pic_name, '.'));
 
-if (((@$_FILES['profilepic']['type']=='image/jpeg') || (@$_FILES['profilepic']['type']=='image/png') || (@$_FILES['profilepic']['type']=='image/gif')) && (@$_FILES['profilepic']['size'] < 1000000)) {
+	if (((@$_FILES['profilepic']['type']=='image/jpeg') || (@$_FILES['profilepic']['type']=='image/png') || (@$_FILES['profilepic']['type']=='image/gif')) && (@$_FILES['profilepic']['size'] < 1000000)) 
+	{
+		$item = $item;
 
-	$item = $item;
-	if (file_exists("../image/product/$item")) {
-		//nothing
-	}else {
-		mkdir("../image/product/$item");
-	}
-	
-	
-	$filename = strtotime(date('Y-m-d H:i:s')).$file_ext;
-
-	if (file_exists("../image/product/$item/".$filename)) {
-		echo @$_FILES["profilepic"]["name"]."Already exists";
-	}else {
-		if(move_uploaded_file(@$_FILES["profilepic"]["tmp_name"], "../image/product/$item/".$filename)){
-			$photos = $filename;
-			$result = mysqli_query($con, "INSERT INTO products(pName,price,piece,description,available,category,type,item,pCode,picture) VALUES ('$_POST[pname]','$_POST[price]','$_POST[piece]','$_POST[descri]','$_POST[available]','$_POST[category]','$_POST[type]','$_POST[item]','$_POST[code]','$photos')");
-				header("Location: allproducts.php");
-		}else {
-			echo "Something Worng on upload!!!";
+		if (file_exists("../image/product/$item")) 
+		{
+			//nothing
 		}
-		//echo "Uploaded and stored in: userdata/profile_pics/$item/".@$_FILES["profilepic"]["name"];
+		else 
+		{
+			mkdir("../image/product/$item");
+		}
 		
 		
+		$filename = strtotime(date('Y-m-d H:i:s')).$file_ext;
+
+		if (file_exists("../image/product/$item/".$filename)) 
+		{
+			echo @$_FILES["profilepic"]["name"]."Already exists";
+		}
+		else 
+		{
+			if(move_uploaded_file(@$_FILES["profilepic"]["tmp_name"], "../image/product/$item/".$filename))
+			{
+				$photos = $filename;
+				$result = mysqli_query($con, "INSERT INTO products(pName,price,piece,description,available,category,type,item,pCode,picture) VALUES ('$_POST[pname]','$_POST[price]','$_POST[piece]','$_POST[descri]','$_POST[available]','$_POST[category]','$_POST[type]','$_POST[item]','$_POST[code]','$photos')");
+					
+				header("Location: all_products.php");
+			}
+			else 
+			{
+				echo "Something Worng on upload!!!";
+			}
+			//echo "Uploaded and stored in: userdata/profile_pics/$item/".@$_FILES["profilepic"]["name"];
+		}
 	}
-	}
-	else {
+	else 
+	{
 		$error_message = 'Add picture!';
 	}
 }
@@ -91,7 +105,8 @@ $search_value = "";
 			<div class="signinButton loginButton">
 				<div class="uiloginbutton signinButton loginButton" style="margin-right: 40px;">
 					<?php 
-						if ($user!="") {
+						if ($user_id != "") 
+						{
 							echo '<a style="text-decoration: none;color: #fff;" href="logout.php">LOG OUT</a>';
 						}
 					 ?>

@@ -4,7 +4,7 @@
 ob_start();
 session_start();
 
-if (isset($_SESSION['user_i'])) 
+if (isset($_SESSION['user_id'])) 
 {
 	header("location: index.php");
 }
@@ -13,22 +13,22 @@ if (isset($_POST['login']))
 {
 	if (isset($_POST['email']) && isset($_POST['password'])) 
 	{
-		$user_email = mb::convert_case(mysqli::real_escape_string($con, $_POST['email']), MB_CASE_LOWER, "UTF-8");
-		$user_password = mysqli::real_escape_string($con, $_POST['password']);		
+		$user_email = mb_convert_case(mysqli_real_escape_string($con, $_POST['email']), MB_CASE_LOWER, "UTF-8");
+		$user_password = mysqli_real_escape_string($con, $_POST['password']);		
 
 		$password_hash = md5($user_password);
 		
-		$result = mysqli::query($con, "SELECT * FROM users WHERE (email='$user_email') AND password='$password_hash' AND active=1");
-		$user = mysqli::fetch_assoc($result);
+		$result = mysqli_query($con, "SELECT * FROM users WHERE (email='$user_email') AND password='$password_hash' AND is_active=1");
+		$user = mysqli_fetch_assoc($result);
 
-		if (mysqli::num_rows($result) > 0) 
+		if (mysqli_num_rows($result) > 0) 
 		{
 			$_SESSION['user_id'] = $user['user_id'];
 			setcookie('user_id', $user['user_id'], time() + (365 * 24 * 60 * 60), "/");
 			
 			if (isset($_REQUEST['ono'])) 
 			{
-				$ono = mysqli::real_escape_string($con, $_REQUEST['ono']);
+				$ono = mysqli_real_escape_string($con, $_REQUEST['ono']);
 				header("location: order.php?poid=".$ono."");
 			}
 			else 
@@ -40,10 +40,10 @@ if (isset($_POST['login']))
 		}
 		else 
 		{
-			$result = mysqli::query($con, "SELECT * FROM user WHERE (email='$user_email') AND password='$password_hash' AND active=0");
-			$user = mysqli::fetch_assoc($result);
+			$result = mysqli_query($con, "SELECT * FROM users WHERE (email='$user_email') AND password='$password_hash' AND is_active=0");
+			$user = mysqli_fetch_assoc($result);
 
-			if (mysqli::num_rows($result) > 0) 
+			if (mysqli_num_rows($result) > 0) 
 			{
 				$confirmation_email = $user_email;
 				$activation = true;
@@ -67,23 +67,23 @@ if(isset($_POST['activate']))
 {
 	if(isset($_POST['actcode']))
 	{
-		$user_email = mb_convert_case(mysqli::real_escape_string($con, $confirmation_email), MB_CASE_LOWER, "UTF-8");
-		$activation_code = mysqli::real_escape_string($con, $_POST['actcode']);
+		$user_email = mb_convert_case(mysqli_real_escape_string($con, $confirmation_email), MB_CASE_LOWER, "UTF-8");
+		$activation_code = mysqli_real_escape_string($con, $_POST['actcode']);
 
-		$result = mysqli::query($con, "SELECT * FROM user WHERE (email='$user_email') AND confirm_code='$activation_code'");
+		$result = mysqli_query($con, "SELECT * FROM user WHERE (email='$user_email') AND confirm_code='$activation_code'");
 
-		if (mysqli::num_rows($result) > 0) 
+		if (mysqli_num_rows($result) > 0) 
 		{
-			$user = mysqli::fetch_assoc($result);
+			$user = mysqli_fetch_assoc($result);
 
 			$_SESSION['user_id'] = $user['user_id'];
 			setcookie('user_id', $user['user_id'], time() + (365 * 24 * 60 * 60), "/");
 
-			mysqli::query($con, "UPDATE user SET confirm_code='0', active=1 WHERE email='$user_email'");
+			mysqli_query($con, "UPDATE user SET confirm_code='0', is_active=1 WHERE email='$user_email'");
 			
 			if (isset($_REQUEST['ono'])) 
 			{
-				$ono = mysqli::real_escape_string($con, $_REQUEST['ono']);
+				$ono = mysqli_real_escape_string($con, $_REQUEST['ono']);
 				header("location: order.php?poid=".$ono."");
 			}
 			else 
@@ -146,12 +146,12 @@ if(isset($_POST['activate']))
 								<h1>Insira o código de ativação.</h1>
                                 <div>
                                     <td>
-                                        <input name="actcode" placeholder="Activation Code" required="required" class="email signupbox" type="text" size="30" value="'.$acccode.'">
+                                        <input name="actcode" placeholder="Insira o código de ativação." required="required" class="email signupbox" type="text" size="30">
                                     </td>
                                 </div>
 
                                 <div>
-                                    <input name="activate" class="uisignupbutton signupbutton" type="submit" value="Active Account">
+                                    <input name="activate" class="uisignupbutton signupbutton" type="submit" value="Ativar">
                                 </div>
                             ';
                         }

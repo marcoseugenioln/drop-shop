@@ -3,27 +3,33 @@
 
 ob_start();
 session_start();
-if (!isset($_SESSION['user_login'])) {
+
+if (!isset($_SESSION['user_id'])) 
+{
 	header("location: login.php");
 }
-else {
-	$user = $_SESSION['user_login'];
-	$result = mysqli_query($con, "SELECT * FROM user WHERE id='$user'");
-		$get_user_email = mysqli_fetch_assoc($result);
-			$uname_db = $get_user_email['firstName'];
-			$uemail_db = $get_user_email['email'];
+else 
+{
+	$user_id = $_SESSION['user_id'];
+	$user = mysqli_fetch_assoc(mysqli_query($con, "SELECT * FROM users WHERE user_id='$user_id'"));
 
-			$umob_db = $get_user_email['mobile'];
-			$uadd_db = $get_user_email['address'];
+	$user_first_name = $user['first_name'];
+	$user_email = $user['email'];
+	$user_mobile = $user['mobile'];
+	$user_address = $user['address'];
 }
 
-if (isset($_REQUEST['uid'])) {
+if (isset($_REQUEST['user_id'])) {
 	
-	$user2 = mysqli_real_escape_string($con, $_REQUEST['uid']);
-	if($user != $user2){
+	$requested_user_id = mysqli_real_escape_string($con, $_REQUEST['user_id']);
+	
+	if($user_id != $requested_user_id)
+	{
 		header('location: index.php');
 	}
-}else {
+}
+else 
+{
 	header('location: index.php');
 }
 
@@ -42,10 +48,12 @@ $search_value = "";
 			<div class="signinButton loginButton">
 				<div class="uiloginbutton signinButton loginButton" style="margin-right: 40px;">
 					<?php 
-						if ($user!="") {
+						if ($user_id != "") 
+						{
 							echo '<a style="text-decoration: none; color: #fff;" href="logout.php">LOG OUT</a>';
 						}
-						else {
+						else 
+						{
 							echo '<a style="text-decoration: none; color: #fff;" href="signin.php">SIGN IN</a>';
 						}
 					 ?>
@@ -53,10 +61,12 @@ $search_value = "";
 				</div>
 				<div class="uiloginbutton signinButton loginButton" style="">
 					<?php 
-						if ($user!="") {
-							echo '<a style="text-decoration: none; color: #fff;" href="profile.php?uid='.$user.'">Hi '.$uname_db.'</a>';
+						if ($user_id!="") 
+						{
+							echo '<a style="text-decoration: none; color: #fff;" href="profile.php?user_id='.$user_id.'">Hi '.$user_first_name.'</a>';
 						}
-						else {
+						else 
+						{
 							echo '<a style="text-decoration: none; color: #fff;" href="login.php">LOG IN</a>';
 						}
 					 ?>
@@ -79,14 +89,14 @@ $search_value = "";
 		<div class="categolis">
 			<table>
 				<tr>
-					<th><?php echo '<a href="mycart.php?uid='.$user.'" style="text-decoration: none;color: #040403;padding: 4px 12px;background-color: #fff;border-radius: 12px;">My Cart</a>'; ?></th>
+					<th><?php echo '<a href="mycart.php?user_id='.$user_id.'" style="text-decoration: none;color: #040403;padding: 4px 12px;background-color: #fff;border-radius: 12px;">My Cart</a>'; ?></th>
 					<th>
-						<?php echo '<a href="profile.php?uid='.$user.'" style="text-decoration: none;color: #040403;padding: 4px 12px;background-color: #e6b7b8;border-radius: 12px;">My Orders</a>'; ?>
+						<?php echo '<a href="profile.php?user_id='.$user_id.'" style="text-decoration: none;color: #040403;padding: 4px 12px;background-color: #e6b7b8;border-radius: 12px;">My Orders</a>'; ?>
 					</th>
 					<th>
-						<?php echo '<a href="my_delivery.php?uid='.$user.'" style="text-decoration: none;color: #040403;padding: 4px 12px;background-color: #fff;border-radius: 12px;">MyDeliveryHistory</a>'; ?>
+						<?php echo '<a href="my_delivery.php?user_id='.$user_id.'" style="text-decoration: none;color: #040403;padding: 4px 12px;background-color: #fff;border-radius: 12px;">MyDeliveryHistory</a>'; ?>
 					</th>
-					<th><?php echo '<a href="settings.php?uid='.$user.'" style="text-decoration: none;color: #040403;padding: 4px 12px;background-color: #fff;border-radius: 12px;">Settings</a>'; ?></th>
+					<th><?php echo '<a href="settings.php?user_id='.$user_id.'" style="text-decoration: none;color: #040403;padding: 4px 12px;background-color: #fff;border-radius: 12px;">Settings</a>'; ?></th>
 					
 
 				</tr>
@@ -112,42 +122,43 @@ $search_value = "";
 									<th>View</th>
 								</tr>
 								<tr>
-									<?php include ( "inc/connect.inc.php");
-									$query = "SELECT * FROM orders WHERE uid='$user' ORDER BY id DESC";
-									$run = mysqli_query($con, $query);
-									while ($row=mysqli_fetch_assoc($run)) {
-										$pid = $row['pid'];
-										$quantity = $row['quantity'];
-										$oplace = $row['oplace'];
-										$mobile = $row['mobile'];
-										$odate = $row['odate'];
-										$ddate = $row['ddate'];
-										$dstatus = $row['dstatus'];
-										
-										//get product info
-										$query1 = "SELECT * FROM products WHERE id='$pid'";
-										$run1 = mysqli_query($con, $query1);
-										$row1=mysqli_fetch_assoc($run1);
-										$pId = $row1['id'];
-										$pName = substr($row1['pName'], 0,50);
-										$price = $row1['price'];
-										$picture = $row1['picture'];
-										$item = $row1['item'];
-										$category = $row1['category'];
-									 ?>
-									<th><?php echo $pName; ?></th>
-									<th><?php echo $price; ?></th>
-									<th><?php echo $quantity; ?></th>
-									<th><?php echo $odate; ?></th>
-									<th><?php echo $ddate; ?></th>
-									<th><?php echo $oplace; ?></th>
-									<th><?php echo $dstatus; ?></th>
-									<th><?php echo '<div class="home-prodlist-img"><a href="OurProducts/view_product.php?pid='.$pId.'">
+									<?php 
+										while ($row=mysqli_fetch_assoc(mysqli_query($con, "SELECT * FROM orders WHERE user_id='$user' ORDER BY id DESC"))) 
+										{
+											$product_id = $row['product_id'];
+											$quantity = $row['quantity'];
+											$order_place = $row['order_place'];
+											$mobile = $row['mobile'];
+											$order_date = $row['order_date'];
+											$delivery_date = $row['delivery_date'];
+											$delivery_status = $row['delivery_status'];
+											
+											//get product info
+											$product = mysqli_fetch_assoc(mysqli_query($con, "SELECT * FROM products WHERE product_id='$product_id'"));
+											
+											$product_name = substr($product['product_name'], 0,50);
+											$price = $product['price'];
+											$picture = $product['picture'];
+											$item = $product['item'];
+											$category = $product['category'];
+
+											echo '<th>'.$product_name.'</th>';
+											echo '<th>'.$price.'</th>';
+											echo '<th>'.$quantity.'</th>';
+											echo '<th>'.$order_date.'</th>';
+											echo '<th>'.$delivery_date.'</th>';
+											echo '<th>'.$order_place.'</th>';
+											echo '<th>'.$delivery_status.'</th>';
+
+											echo 
+											'<th><div class="home-prodlist-img">
+												<a href="OurProducts/view_product.php?product_id='.$product_id.'">
 													<img src="image/product/'.$item.'/'.$picture.'" class="home-prodlist-imgi" style="height: 75px; width: 75px;">
-													</a>
-												</div>' ?></th>
+												</a>
+											</div></th>';
+										}
+									 ?>
 								</tr>
-								<?php } ?>
 							</table>
 						</div>
 					</div>
@@ -155,7 +166,5 @@ $search_value = "";
 			</ul>
 		</div>
 	</div>
-
-	
 </body>
 </html>

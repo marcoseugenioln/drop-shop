@@ -1,17 +1,22 @@
 <?php include ( "../inc/connect.inc.php" ); ?>
+<?php include ( "../utils.php" ); ?>
+
 <?php 
+
 ob_start();
 session_start();
-if (!isset($_SESSION['admin_login'])) {
-	header("location: login.php");
-	$user = "";
+
+if (isset($_SESSION['user_id'])) 
+{
+	$user_id = $_SESSION['user_id'];
+	$user = get_user($con, $user_id);
+
+	$user_first_name = $user['first_name'];
 }
-else {
-	$user = $_SESSION['admin_login'];
-	$result = mysqli_query($con, "SELECT * FROM admin WHERE id='$user'");
-		$get_user_email = mysqli_fetch_assoc($result);
-			$uname_db = $get_user_email['firstName'];
-			$utype_db=$get_user_email['type'];
+else 
+{
+	header("location: ../login.php");
+	$user_id = "";
 }
 
 ?>
@@ -36,10 +41,12 @@ else {
 				</div>
 				<div class="uiloginbutton signinButton loginButton">
 					<?php 
-						if ($user!="") {
-							echo '<a style="text-decoration: none;color: #fff;" href="login.php">Hi '.$uname_db.'</br><span style="color: #de2a74">'.$utype_db.'</span></a>';
+						if ($user_id != "") 
+						{
+							echo '<a style="text-decoration: none;color: #fff;" href="login.php">Hi '.$user_first_name.'</br><span style="color: #de2a74">'.$utype_db.'</span></a>';
 						}
-						else {
+						else 
+						{
 							echo '<a style="text-decoration: none;color: #fff;" href="login.php">LOG IN</a>';
 						}
 					 ?>

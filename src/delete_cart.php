@@ -10,53 +10,66 @@ if (!isset($_SESSION['user_id']))
 }
 else 
 {
-	$user = $_SESSION['user_login'];
-	$result = mysqli_query($con, "SELECT * FROM user WHERE id='$user'");
+	$user_id = $_SESSION['user_id'];
+	$result = mysqli_query($con, "SELECT * FROM users WHERE user_id='$user_id'");
 	$user = mysqli_fetch_assoc($result);
-	$uname_db = $user['firstName'];
-	$uemail_db = $user['email'];
+	$user_first_name = $user['first_name'];
+	$user_email = $user['email'];
 
-	$umob_db = $user['mobile'];
-	$uadd_db = $user['address'];
+	$user_mobile = $user['mobile'];
+	$user_address = $user['address'];
 }
 
 
-if (isset($_REQUEST['cid'])) {
-		$cid = mysqli_real_escape_string($con, $_REQUEST['cid']);
-		if(mysqli_query($con, "DELETE FROM cart WHERE pid='$cid' AND uid='$user'")){
-		header('location: cart.php?uid='.$user.'');
-	}else{
-		header('location: index.php');
+if (isset($_REQUEST['cid'])) 
+{
+	$product_id = mysqli_real_escape_string($con, $_REQUEST['cid']);
+
+	if(mysqli_query($con, "DELETE FROM cart WHERE pid='$product_id' AND user_id='$user_id'"))
+	{
+		header('location: cart.php?user_id='.$user_id.'');
 	}
-}
-if (isset($_REQUEST['aid'])) {
-		$aid = mysqli_real_escape_string($con, $_REQUEST['aid']);
-		$result = mysqli_query($con, "SELECT * FROM cart WHERE pid='$aid'");
-		$get_p = mysqli_fetch_assoc($result);
-		$num = $get_p['quantity'];
-		$num += 1;
-
-		if(mysqli_query($con, "UPDATE cart SET quantity='$num' WHERE pid='$aid' AND uid='$user'")){
-		header('location: cart.php?uid='.$user.'');
-	}else{
-		header('location: index.php');
-	}
-}
-if (isset($_REQUEST['sid'])) {
-		$sid = mysqli_real_escape_string($con, $_REQUEST['sid']);
-		$result = mysqli_query($con, "SELECT * FROM cart WHERE pid='$sid'");
-		$get_p = mysqli_fetch_assoc($result);
-		$num = $get_p['quantity'];
-		$num -= 1;
-		if ($num <= 0){
-			$num = 1;
-		}
-		if(mysqli_query($con, "UPDATE cart SET quantity='$num' WHERE pid='$sid' AND uid='$user'")){
-		header('location: mycart.php?uid='.$user.'');
-	}else{
+	else
+	{
 		header('location: index.php');
 	}
 }
 
+if (isset($_REQUEST['aid'])) 
+{
+	$product_id = mysqli_real_escape_string($con, $_REQUEST['aid']);
+	$cart_item = mysqli_fetch_assoc(mysqli_query($con, "SELECT * FROM cart WHERE product_id='$product_id'"));
+	$new_quantity = $cart_item['quantity'] + 1;
+
+	if(mysqli_query($con, "UPDATE cart SET quantity='$new_quantity' WHERE product_id='$product_id' AND user_id='$user_id'"))
+	{
+		header('location: cart.php?user_id='.$user.'');
+	}
+	else
+	{
+		header('location: index.php');
+	}
+}
+
+if (isset($_REQUEST['sid'])) 
+{
+	$product_id = mysqli_real_escape_string($con, $_REQUEST['sid']);
+	$cart_item = mysqli_fetch_assoc(mysqli_query($con, "SELECT * FROM cart WHERE product_id='$product_id'"));
+	$new_quantity = $get_p['quantity'] - 1;
+
+	if ($new_quantity <= 0)
+	{
+		$new_quantity = 1;
+	}
+
+	if(mysqli_query($con, "UPDATE cart SET quantity='$num' WHERE pid='$sid' AND user_id='$user_id'"))
+	{
+		header('location: mycart.php?user_id='.$user_id.'');
+	}
+	else
+	{
+		header('location: index.php');
+	}
+}
 
 ?>

@@ -3,93 +3,109 @@
 
 ob_start();
 session_start();
-if (!isset($_SESSION['user_login'])) {
+
+if (!isset($_SESSION['user_id'])) 
+{
 	header("location: login.php");
 }
-else {
-	$user = $_SESSION['user_login'];
-	$result = mysqli_query($con, "SELECT * FROM user WHERE id='$user'");
-	$get_user_email = mysqli_fetch_assoc($result);
-	$uname_db = $get_user_email != null ? $get_user_email['firstName'] : null;
-	$uemail_db = $get_user_email != null ? $get_user_email['email'] : null;
-	$ulast_db= $get_user_email != null ? $get_user_email['lastName'] : null;
+else 
+{
+	$user_id = $_SESSION['user_id'];
+	$user = mysqli_fetch_assoc(mysqli_query($con, "SELECT * FROM users WHERE user_id='$user_id'"));
 
-	$umob_db = $get_user_email != null ? $get_user_email['mobile'] : null;
-	$uadd_db = $get_user_email != null ? $get_user_email['address'] : null;
+	$user_first_name = $user != null ? $user['firstName'] : null;
+	$user_last_name= $user != null ? $user['lastName'] : null;
+	$user_email = $user != null ? $user['email'] : null;
+	$user_mobile = $user != null ? $user['mobile'] : null;
+	$user_address = $user != null ? $user['address'] : null;
 }
 
-if (isset($_REQUEST['uid'])) {
-	
-	$user2 = mysqli_real_escape_string($con, $_REQUEST['uid']);
-	if($user != $user2){
+if (isset($_REQUEST['user_id'])) 
+{
+	$user2 = mysqli_real_escape_string($con, $_REQUEST['user_id']);
+
+	if($user_id != $user2)
+	{
 		header('location: index.php');
 	}
-}else {
+}
+else 
+{
 	header('location: index.php');
 }
 
-if (isset($_REQUEST['cid'])) {
-		$cid = mysqli_real_escape_string($con, $_REQUEST['cid']);
-		if(mysqli_query($con, "DELETE FROM orders WHERE pid='$cid' AND uid='$user'")){
-		header('location: mycart.php?uid='.$user.'');
-	}else{
+if (isset($_REQUEST['cid'])) 
+{
+	$cid = mysqli_real_escape_string($con, $_REQUEST['cid']);
+
+	if(mysqli_query($con, "DELETE FROM orders WHERE product_id='$cid' AND user_id='$user_id'"))
+	{
+		header('location: mycart.php?user_id='.$user_id.'');
+	}
+	else
+	{
 		header('location: index.php');
 	}
 }
 
 $search_value = "";
 
-
 //order
 
-if (isset($_POST['order'])) {
-//declere veriable
-$mbl = $_POST['mobile'];
-$addr = $_POST['address'];
-$del = $_POST['Delivery'];
-//triming name
+if (isset($_POST['order'])) 
+{
+	//declere veriable
+	$mobile = $_POST['mobile'];
+	$address = $_POST['address'];
+	$delivery = $_POST['Delivery'];
+
+	//triming name
 	try {
-		if(empty($_POST['mobile'])) {
+		if(empty($_POST['mobile'])) 
+		{
 			throw new Exception('Mobile can not be empty');
-			
 		}
-		if(empty($_POST['address'])) {
+		if(empty($_POST['address'])) 
+		{
 			throw new Exception('Address can not be empty');
-			
 		}
-		if(empty($_POST['Delivery'])) {
+		if(empty($_POST['Delivery'])) 
+		{
 			throw new Exception('Type of Delivery can not be empty');
-			
 		}
 
 		
 		// Check if email already exists
 		
 		
-						$d = date("Y-m-d"); //Year - Month - Day
+		$d = date("Y-m-d"); //Year - Month - Day
 						
-						// send email
-						$msg = "
-					
-						Your Order suc
+		// send email
+		$msg = "
+	
+		Your Order suc
 
-						
-						";
-						//if (@mail($uemail_db,"eBuyBD Product Order",$msg, "From:eBuyBD <no-reply@ebuybd.xyz>")) {
-						$result = mysqli_query($con, "SELECT * FROM cart WHERE uid='$user'");
-						$t = mysqli_num_rows($result);
-						if($t <= 0) {
-							throw new Exception('No product in cart. Add product first.');
-							
-						}
-						while ($get_p = mysqli_fetch_assoc($result)) {
-							$num = $get_p['quantity'];
-							$pid = $get_p['pid'];
+		
+		";
 
-							mysqli_query($con, "INSERT INTO orders (uid,pid,quantity,oplace,mobile,odate,delivery) VALUES ('$user','$pid',$num,'$_POST[address]','$_POST[mobile]','$d','$del')");
-						}
+		//if (@mail($user_email,"eBuyBD Product Order",$msg, "From:eBuyBD <no-reply@ebuybd.xyz>")) {
+		$result = mysqli_query($con, "SELECT * FROM cart WHERE user_id='$user_id'");
+		$items = mysqli_num_rows($result);
+
+		if($items <= 0) 
+		{
+			throw new Exception('No product in cart. Add product first.');
+		}
+
+		while ($get_p = mysqli_fetch_assoc($result)) 
+		{
+			$num = $get_p['quantity'];
+			$pid = $get_p['pid'];
+
+			mysqli_query($con, "INSERT INTO orders (user_id,product_id,quantity,oplace,mobile,odate,delivery) VALUES ('$user','$pid',$num,'$_POST[address]','$_POST[mobile]','$d','$del')");
+		}
 							
-						if(mysqli_query($con, "DELETE FROM cart WHERE uid='$user'")){
+						if(mysqli_query($con, "DELETE FROM cart WHERE user_id='$user'")){
 
 							//success message
 							
@@ -138,7 +154,7 @@ $del = $_POST['Delivery'];
 				<div class="uiloginbutton signinButton loginButton" style="">
 					<?php 
 						if ($user!="") {
-							echo '<a style="text-decoration: none; color: #fff;" href="profile.php?uid='.$user.'">Hi '.$uname_db.'</a>';
+							echo '<a style="text-decoration: none; color: #fff;" href="profile.php?user_id='.$user.'">Hi '.$user_first_name.'</a>';
 						}
 						else {
 							echo '<a style="text-decoration: none; color: #fff;" href="login.php">LOG IN</a>';
@@ -163,14 +179,14 @@ $del = $_POST['Delivery'];
 		<div class="categolis">
 			<table>
 				<tr>
-					<th><?php echo '<a href="mycart.php?uid='.$user.'" style="text-decoration: none;color: #040403;padding: 4px 12px;background-color: #e6b7b8;border-radius: 12px;">My Cart</a>'; ?></th>
+					<th><?php echo '<a href="mycart.php?user_id='.$user.'" style="text-decoration: none;color: #040403;padding: 4px 12px;background-color: #e6b7b8;border-radius: 12px;">My Cart</a>'; ?></th>
 					<th>
-						<?php echo '<a href="profile.php?uid='.$user.'" style="text-decoration: none;color: #040403;padding: 4px 12px;background-color: #fff;border-radius: 12px;">My Orders</a>'; ?>
+						<?php echo '<a href="profile.php?user_id='.$user.'" style="text-decoration: none;color: #040403;padding: 4px 12px;background-color: #fff;border-radius: 12px;">My Orders</a>'; ?>
 					</th>
 					<th>
-						<?php echo '<a href="my_delivery.php?uid='.$user.'" style="text-decoration: none;color: #040403;padding: 4px 12px;background-color: #fff;border-radius: 12px;">MyDeliveryHistory</a>'; ?>
+						<?php echo '<a href="my_delivery.php?user_id='.$user.'" style="text-decoration: none;color: #040403;padding: 4px 12px;background-color: #fff;border-radius: 12px;">MyDeliveryHistory</a>'; ?>
 					</th>
-					<th><?php echo '<a href="settings.php?uid='.$user.'" style="text-decoration: none;color: #040403;padding: 4px 12px;background-color: #fff;border-radius: 12px;">Settings</a>'; ?></th>
+					<th><?php echo '<a href="settings.php?user_id='.$user.'" style="text-decoration: none;color: #040403;padding: 4px 12px;background-color: #fff;border-radius: 12px;">Settings</a>'; ?></th>
 					
 
 				</tr>
@@ -194,7 +210,7 @@ $del = $_POST['Delivery'];
 								</tr>
 								<tr>
 									<?php include ( "inc/connect.inc.php");
-									$query = "SELECT * FROM cart WHERE uid='$user' ORDER BY id DESC";
+									$query = "SELECT * FROM cart WHERE user_id='$user' ORDER BY id DESC";
 									$run = mysqli_query($con, $query);
 									$total = 0;
 									while ($row=mysqli_fetch_assoc($run)) {
@@ -257,21 +273,21 @@ $del = $_POST['Delivery'];
 							$user = $_SESSION['user_login'];
 		$result = mysqli_query($con, "SELECT * FROM user WHERE id='$user'");
 			$get_user_email = mysqli_fetch_assoc($result);
-				$uname_db = $get_user_email['firstName'];
-				$ulast_db=$get_user_email['lastName'];
-				$uemail_db = $get_user_email['email'];
-				$umob_db = $get_user_email['mobile'];
-				$uadd_db = $get_user_email['address'];
+				$user_first_name = $get_user_email['firstName'];
+				$user_last_name=$get_user_email['lastName'];
+				$user_email = $get_user_email['email'];
+				$user_mobile = $get_user_email['mobile'];
+				$user_address = $get_user_email['address'];
 				echo '<h3 style="color:black;font-size:25px;"> First Name: </h3>';
-				echo'<span style="color:#34ce6c;font-size:25px;">'. $uname_db.'</span>';
+				echo'<span style="color:#34ce6c;font-size:25px;">'. $user_first_name.'</span>';
 				echo '<h3 style="color:black;font-size:25px;"> Last Name: </h3>';
-				echo'<span style="color:#34ce6c;font-size:25px;">' .$ulast_db.'</span>';
+				echo'<span style="color:#34ce6c;font-size:25px;">' .$user_last_name.'</span>';
 				echo '<h3 style="color:black;font-size:25px;"> Email: </h3>'; 
-				echo '<span style="color:#34ce6c;font-size:25px;">' .$uemail_db.'</span>';
+				echo '<span style="color:#34ce6c;font-size:25px;">' .$user_email.'</span>';
 				echo '<h3 style="color:black;font-size:25px;"> Contact Number: </h3>';
-				echo '<span style="color:#34ce6c;font-size:25px;">' .$umob_db.'</span>';
+				echo '<span style="color:#34ce6c;font-size:25px;">' .$user_mobile.'</span>';
 				echo '<h3 style="color:black;font-size:25px;"> Home Address: </h3>';
-				echo '<span style="color:#34ce6c;font-size:25px;">'.$uadd_db.'</span>';
+				echo '<span style="color:#34ce6c;font-size:25px;">'.$user_address.'</span>';
 				
 				$del = $_POST['Delivery'] ;
 				echo '<h3 style="color:black;font-size:25px;">Types of Delivery:</h3>';
@@ -293,13 +309,13 @@ $del = $_POST['Delivery'];
 									<h3 style="color:red;font-size:18px; padding: 5px;">Accepting CashOnDelivery Only</h3>
 										<div>
 											<td>
-												<input name="fullname" placeholder="your name" required="required" class="email signupbox" type="text" size="30" value="'.$uname_db.'">
+												<input name="fullname" placeholder="your name" required="required" class="email signupbox" type="text" size="30" value="'.$user_first_name.'">
 											</td>
 										</div>
 
 										<div>
 											<td>
-												<input name="lastname" placeholder="Your last name" required="required" class="email signupbox" type="text" size="30" value="'.$ulast_db.'">
+												<input name="lastname" placeholder="Your last name" required="required" class="email signupbox" type="text" size="30" value="'.$user_last_name.'">
 											</td>
 										</div>
 
@@ -307,12 +323,12 @@ $del = $_POST['Delivery'];
 
 										<div>
 										<td>
-												<input name="mobile" placeholder="Your mobile number" required="required" class="email signupbox" type="text" size="30" value="'.$umob_db.'">
+												<input name="mobile" placeholder="Your mobile number" required="required" class="email signupbox" type="text" size="30" value="'.$user_mobile.'">
 											</td>
 										</div>
 										<div>
 											<td>
-												<input name="address" id="password-1" required="required"  placeholder="Write your full address" class="password signupbox " type="text" size="30" value="'.$uadd_db.'">
+												<input name="address" id="password-1" required="required"  placeholder="Write your full address" class="password signupbox " type="text" size="30" value="'.$user_address.'">
 											</td>
 										</div>
 

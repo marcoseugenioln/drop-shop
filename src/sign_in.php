@@ -39,11 +39,11 @@ if (isset($_POST['signup']))
 		}
 		if(empty($_POST['last_name'])) 
 		{
-			throw new Exception('Lastname can not be empty');
+			throw new Exception('last_name can not be empty');
 		}
 		if (is_numeric($_POST['last_name'][0])) 
 		{
-			throw new Exception('lastname first character must be a letter!');
+			throw new Exception('last_name first character must be a letter!');
 		}
 		if(empty($_POST['email'])) 
 		{
@@ -84,6 +84,7 @@ if (isset($_POST['signup']))
 						$_POST['password'] = md5($_POST['password']);
 
 						$confirmation_code = substr( rand() * 900000 + 100000, 0, 6 );
+						
 						// send email
 						$msg = "
 						...
@@ -92,7 +93,7 @@ if (isset($_POST['signup']))
 						Signup email: ".$_POST['email']."
 						
 						";							
-						$result = mysqli_query($con, "INSERT INTO user (firstName,lastName,email,mobile,address,password,confirmCode) VALUES ('$_POST[first_name]','$_POST[last_name]','$_POST[email]','$_POST[mobile]','$_POST[signupaddress]','$_POST[password]','$confirmCode')");
+						$result = mysqli_query($con, "INSERT INTO users (first_name,last_name,email,mobile,address,password,confirmation_code) VALUES ('$_POST[first_name]','$_POST[last_name]','$_POST[email]','$_POST[mobile]','$_POST[signupaddress]','$_POST[password]','$confirmation_code')");
 
 						$success_message = 
 						'
@@ -101,7 +102,7 @@ if (isset($_POST['signup']))
 							<font face="bookman">
 								Email: '.$user_email.'<br>
 								Activation code sent to your email. <br>
-								Your activation code: '.$confirmCode.'
+								Your activation code: '.$confirmation_code.'
 							</font></div></div>
 						';
 					}
@@ -117,13 +118,13 @@ if (isset($_POST['signup']))
 			}
 			else 
 			{
-				throw new Exception('Lastname must be 2-20 characters!');
+				throw new Exception('last_name must be 2-20 characters!');
 			}
 		}
 		
 		else 
 		{
-			throw new Exception('Firstname must be 2-20 characters!');
+			throw new Exception('first_name must be 2-20 characters!');
 		}
 
 	}
@@ -159,7 +160,9 @@ if (isset($_POST['signup']))
 				</div>
 				<div class="form-register">         
 					<form class="personal-data" method="POST">
-						<label for="nome-completo">Nome completo*</label><br>
+						<label for="nome-completo">Nome</label><br>
+							<input type="text" name="nome-completo"><br>
+						<label for="nome-completo">Sobrenome</label><br>
 							<input type="text" name="nome-completo"><br>
 						<label for="genero">Gênero*</label><br>
 						<select class="gender" name="genero">

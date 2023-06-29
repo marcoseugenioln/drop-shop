@@ -2,16 +2,18 @@
 <?php 
 ob_start();
 session_start();
-if (!isset($_SESSION['admin_login'])) {
-	header("location: login.php");
-	$user = "";
-}
-else {
+if (isset($_SESSION['user_id'])) 
+{
 	$user = $_SESSION['admin_login'];
-	$result = mysqli_query($con, "SELECT * FROM admin WHERE id='$user'");
-		$get_user_email = mysqli_fetch_assoc($result);
-			$uname_db = $get_user_email['firstName'];
-			$utype_db=$get_user_email['type'];
+	$result = mysqli_query($con, "SELECT * FROM users WHERE user_id='$user_id'");
+	$get_user_email = mysqli_fetch_assoc($result);
+	$uname_db = $get_user_email['firstName'];
+	$utype_db=$get_user_email['type'];
+}
+else 
+{
+	header("location: ../login.php");
+	$user = "";
 }
 
 $search_value = "";
