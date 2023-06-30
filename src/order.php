@@ -9,46 +9,50 @@ if (isset($_REQUEST['poid'])) {
 }
 ob_start();
 session_start();
-if (!isset($_SESSION['user_login'])) {
-	$user = "";
+if (isset($_SESSION['user_login'])) 
+{
+	$user_id = $_SESSION['user_id'];
+	$user = mysqli_fetch_assoc(mysqli_query($con, "SELECT * FROM users WHERE user_id='$user_id'"));
+
+	$user_first_name = $user['first_name'];
+	$user_last_name = $user['last_name'];
+	$user_email = $user['email'];
+	$user_mobile = $user['mobile'];
+	$user_address = $user['address'];
+}
+else 
+{
+	$user_id = "";
 	header("location: login.php?ono=".$poid."");
 }
-else {
-	$user = $_SESSION['user_login'];
-	$result = mysqli_query($con, "SELECT * FROM user WHERE id='$user'");
-		$get_user_email = mysqli_fetch_assoc($result);
-
-			$uname_db = $get_user_email['firstName'];
-			$ulast_db=$get_user_email['lastName'];
-			$uemail_db = $get_user_email['email'];
-
-			$umob_db = $get_user_email['mobile'];
-			$uadd_db = $get_user_email['address'];
-}
 
 
-$getposts = mysqli_query($con, "SELECT * FROM products WHERE id ='$poid'") or die(mysqlI_error($con));
-					if (mysqli_num_rows($getposts)) {
-						$row = mysqli_fetch_assoc($getposts);
-						$id = $row['id'];
-						$pName = $row['pName'];
-						$price = $row['price'];
-						$description = $row['description'];
-						$picture = $row['picture'];
-						$item = $row['item'];
-						$category = $row['category'];
-						$available =$row['available'];
-					}	
+$getposts = mysqli_query($con, "SELECT * FROM products WHERE product_id ='$poid'") or die(mysqlI_error($con));
+
+if (mysqli_num_rows($getposts)) 
+{
+	$row = mysqli_fetch_assoc($getposts);
+	$id = $row['product_id'];
+	$pName = $row['product_name'];
+	$price = $row['price'];
+	$description = $row['description'];
+	$picture = $row['picture'];
+	$item = $row['item'];
+	$category = $row['category'];
+	$available =$row['available'];
+}	
 
 //order
 
-if (isset($_POST['order'])) {
-//declere veriable
-$mbl = $_POST['mobile'];
-$addr = $_POST['address'];
-$quan = $_POST['Quantity'];
-$del = $_POST['Delivery'];
-//triming name
+if (isset($_POST['order'])) 
+{
+	//declere veriable
+	$mbl = $_POST['mobile'];
+	$addr = $_POST['address'];
+	$quan = $_POST['Quantity'];
+	$del = $_POST['Delivery'];
+	
+	//triming name
 	try {
 		if(empty($_POST['mobile'])) {
 			throw new Exception('Mobile can not be empty');
@@ -80,7 +84,7 @@ $del = $_POST['Delivery'];
 
 						
 						";
-						//if (@mail($uemail_db,"eBuyBD Product Order",$msg, "From:eBuyBD <no-reply@ebuybd.xyz>")) {
+						//if (@mail($user_email,"eBuyBD Product Order",$msg, "From:eBuyBD <no-reply@ebuybd.xyz>")) {
 							
 						if(mysqli_query($con, "INSERT INTO orders (uid,pid,quantity,oplace,mobile,odate,delivery) VALUES ('$user','$poid',$quan,'$_POST[address]','$_POST[mobile]','$d','$del')")){
 
@@ -140,7 +144,7 @@ $del = $_POST['Delivery'];
 				<div class="uiloginbutton signinButton loginButton" style="">
 					<?php 
 						if ($user!="") {
-							echo '<a style="text-decoration: none; color: #fff;" href="profile.php?uid='.$user.'">Hi '.$uname_db.'</a>';
+							echo '<a style="text-decoration: none; color: #fff;" href="profile.php?uid='.$user.'">Hi '.$user_first_name.'</a>';
 						}
 						else {
 							echo '<a style="text-decoration: none; color: #fff;" href="login.php">LOG IN</a>';
@@ -193,22 +197,22 @@ $del = $_POST['Delivery'];
 
 						$user = $_SESSION['user_login'];
 	$result = mysqli_query($con, "SELECT * FROM user WHERE id='$user'");
-		$get_user_email = mysqli_fetch_assoc($result);
-			$uname_db = $get_user_email['firstName'];
-			$ulast_db=$get_user_email['lastName'];
-			$uemail_db = $get_user_email['email'];
-			$umob_db = $get_user_email['mobile'];
-			$uadd_db = $get_user_email['address'];
+		$user = mysqli_fetch_assoc($result);
+			$user_first_name = $user['first_name'];
+			$user_last_name=$user['last_name'];
+			$user_email = $user['email'];
+			$user_mobile = $user['mobile'];
+			$user_address = $user['address'];
 			echo '<h3 style="color:black;font-size:25px;"> First Name: </h3>';
-			echo'<span style="color:#34ce6c;font-size:25px;">'. $uname_db.'</span>';
+			echo'<span style="color:#34ce6c;font-size:25px;">'. $user_first_name.'</span>';
 			echo '<h3 style="color:black;font-size:25px;"> Last Name: </h3>';
-			echo'<span style="color:#34ce6c;font-size:25px;">' .$ulast_db.'</span>';
+			echo'<span style="color:#34ce6c;font-size:25px;">' .$user_last_name.'</span>';
 			echo '<h3 style="color:black;font-size:25px;"> Email: </h3>'; 
-			echo '<span style="color:#34ce6c;font-size:25px;">' .$uemail_db.'</span>';
+			echo '<span style="color:#34ce6c;font-size:25px;">' .$user_email.'</span>';
 			echo '<h3 style="color:black;font-size:25px;"> Contact Number: </h3>';
-			echo '<span style="color:#34ce6c;font-size:25px;">' .$umob_db.'</span>';
+			echo '<span style="color:#34ce6c;font-size:25px;">' .$user_mobile.'</span>';
 			echo '<h3 style="color:black;font-size:25px;"> Home Address: </h3>';
-			echo '<span style="color:#34ce6c;font-size:25px;">'.$uadd_db.'</span>';
+			echo '<span style="color:#34ce6c;font-size:25px;">'.$user_address.'</span>';
 			
 			$del = $_POST['Delivery'] ;
 			echo '<h3 style="color:black;font-size:25px;">Types of Delivery:</h3>';
@@ -235,13 +239,13 @@ $del = $_POST['Delivery'];
 								<h3 style="color:red;font-size:18px; padding: 5px;">Accepting CashOnDelivery Only</h3>
 									<div>
 										<td>
-											<input name="fullname" placeholder="your name" required="required" class="email signupbox" type="text" size="30" value="'.$uname_db.'">
+											<input name="fullname" placeholder="your name" required="required" class="email signupbox" type="text" size="30" value="'.$user_first_name.'">
 										</td>
 									</div>
 
 									<div>
 										<td>
-											<input name="lastname" placeholder="Your last name" required="required" class="email signupbox" type="text" size="30" value="'.$ulast_db.'">
+											<input name="last_name" placeholder="Your last name" required="required" class="email signupbox" type="text" size="30" value="'.$user_last_name.'">
 										</td>
 									</div>
 
@@ -249,12 +253,12 @@ $del = $_POST['Delivery'];
 
 									<div>
 									<td>
-											<input name="mobile" placeholder="Your mobile number" required="required" class="email signupbox" type="text" size="30" value="'.$umob_db.'">
+											<input name="mobile" placeholder="Your mobile number" required="required" class="email signupbox" type="text" size="30" value="'.$user_mobile.'">
 										</td>
 									</div>
 									<div>
 										<td>
-											<input name="address" id="password-1" required="required"  placeholder="Write your full address" class="password signupbox " type="text" size="30" value="'.$uadd_db.'">
+											<input name="address" id="password-1" required="required"  placeholder="Write your full address" class="password signupbox " type="text" size="30" value="'.$user_address.'">
 										</td>
 									</div>
 

@@ -59,9 +59,9 @@ $search_value = "";
 					 ?>
 					
 				</div>
-				<div class="uiloginbutton signinButton loginButton" style="">
+				<div class="uiloginbutton signinButton loginButton">
 					<?php 
-						if ($user_id!="") 
+						if ($user_id != "")
 						{
 							echo '<a style="text-decoration: none; color: #fff;" href="profile.php?user_id='.$user_id.'">Hi '.$user_first_name.'</a>';
 						}
@@ -89,14 +89,21 @@ $search_value = "";
 		<div class="categolis">
 			<table>
 				<tr>
-					<th><?php echo '<a href="mycart.php?user_id='.$user_id.'" style="text-decoration: none;color: #040403;padding: 4px 12px;background-color: #fff;border-radius: 12px;">My Cart</a>'; ?></th>
+					<th>
+						<?php echo '<a href="cart.php?user_id='.$user_id.'" style="text-decoration: none;color: #040403;padding: 4px 12px;background-color: #fff;border-radius: 12px;">My Cart</a>'; ?>
+					</th>
+					
 					<th>
 						<?php echo '<a href="profile.php?user_id='.$user_id.'" style="text-decoration: none;color: #040403;padding: 4px 12px;background-color: #e6b7b8;border-radius: 12px;">My Orders</a>'; ?>
 					</th>
+					
 					<th>
 						<?php echo '<a href="my_delivery.php?user_id='.$user_id.'" style="text-decoration: none;color: #040403;padding: 4px 12px;background-color: #fff;border-radius: 12px;">MyDeliveryHistory</a>'; ?>
 					</th>
-					<th><?php echo '<a href="settings.php?user_id='.$user_id.'" style="text-decoration: none;color: #040403;padding: 4px 12px;background-color: #fff;border-radius: 12px;">Settings</a>'; ?></th>
+					
+					<th>
+						<?php echo '<a href="settings.php?user_id='.$user_id.'" style="text-decoration: none;color: #040403;padding: 4px 12px;background-color: #fff;border-radius: 12px;">Settings</a>'; ?>
+					</th>
 					
 
 				</tr>
@@ -123,7 +130,7 @@ $search_value = "";
 								</tr>
 								<tr>
 									<?php 
-										while ($row=mysqli_fetch_assoc(mysqli_query($con, "SELECT * FROM orders WHERE user_id='$user' ORDER BY id DESC"))) 
+										while ($row=mysqli_fetch_assoc(mysqli_query($con, "SELECT * FROM orders WHERE user_id='$user_id' ORDER BY order_id DESC"))) 
 										{
 											$product_id = $row['product_id'];
 											$quantity = $row['quantity'];
@@ -151,11 +158,13 @@ $search_value = "";
 											echo '<th>'.$delivery_status.'</th>';
 
 											echo 
-											'<th><div class="home-prodlist-img">
-												<a href="OurProducts/view_product.php?product_id='.$product_id.'">
-													<img src="image/product/'.$item.'/'.$picture.'" class="home-prodlist-imgi" style="height: 75px; width: 75px;">
-												</a>
-											</div></th>';
+											'<th>
+												<div class="home-prodlist-img">
+													<a href="OurProducts/view_product.php?product_id='.$product_id.'">
+														<img src="image/product/'.$item.'/'.$picture.'" class="home-prodlist-imgi" style="height: 75px; width: 75px;">
+													</a>
+												</div>
+											</th>';
 										}
 									 ?>
 								</tr>

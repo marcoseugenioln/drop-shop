@@ -142,16 +142,18 @@ if (isset($_POST['order']))
 			<div class="signinButton loginButton">
 				<div class="uiloginbutton signinButton loginButton" style="margin-right: 40px;">
 					<?php 
-						if ($user!="") {
+						if ($user!="") 
+						{
 							echo '<a style="text-decoration: none; color: #fff;" href="logout.php">LOG OUT</a>';
 						}
-						else {
+						else 
+						{
 							echo '<a style="text-decoration: none; color: #fff;" href="signin.php">SIGN IN</a>';
 						}
 					 ?>
 					
 				</div>
-				<div class="uiloginbutton signinButton loginButton" style="">
+				<div class="uiloginbutton signinButton loginButton">
 					<?php 
 						if ($user!="") {
 							echo '<a style="text-decoration: none; color: #fff;" href="profile.php?user_id='.$user.'">Hi '.$user_first_name.'</a>';
@@ -262,7 +264,7 @@ if (isset($_POST['order']))
 		<div class="holecontainer" style="float: right;width: 35%;">
 			<div class="container signupform_content ">
 				<div>
-					<div style="">
+					<div>
 					
 					<?php 
 						if(isset($success_message)) {echo $success_message;

@@ -3,45 +3,50 @@
 ob_start();
 session_start();
 
-if (!isset($_SESSION['user_login'])) {
-	$user = "";
+if (isset($_SESSION['user_id'])) 
+{
+	$user_id = $_SESSION['user_id'];
+	$user = mysqli_fetch_assoc(mysqli_query($con, "SELECT * FROM users WHERE user_id='$user_id'"));
+	$uname_db = $user != null ? $user['first_name'] : null;
 }
-else {
-	$user = $_SESSION['user_login'];
-	$result = mysqli_query($con, "SELECT * FROM user WHERE id='$user'");
-	$get_user_email = mysqli_fetch_assoc($result);
-	$uname_db = $get_user_email != null ? $get_user_email['firstName'] : null;
+else 
+{
+	$user_id = "";
 }
 ?>
+
 <!DOCTYPE html>
 <html>
 	<head>
 		<title>Welcome to Drop Shop</title>
-		<link rel="stylesheet" type="text/css" href="css/style.css">
+		<link rel="stylesheet" type="text/css" href="stylesheet/index.css">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-		<script src="/js/homeslideshow.js"></script>
+		<script src="scripts/slide_show.js"></script>
 	</head>
 	<body style="min-width: 980px;">
 		<div class="homepageheader" style="position: relative;">
 			<div class="signinButton loginButton">
 				<div class="uiloginbutton signinButton loginButton" style="margin-right: 40px;">
 					<?php 
-						if ($user!="") {
+						if ($user_id != "") 
+						{
 							echo '<a style="text-decoration: none; color: #fff;" href="logout.php">LOG OUT</a>';
 						}
-						else {
+						else 
+						{
 							echo '<a style="color: #fff; text-decoration: none;" href="signin.php">SIGN UP</a>';
 						}
 					 ?>
 					
 				</div>
-				<div class="uiloginbutton signinButton loginButton" style="">
+				<div class="uiloginbutton signinButton loginButton">
 					<?php 
-						if ($user!="") {
-							echo '<a style="text-decoration: none; color: #fff;" href="profile.php?uid='.$user.'">Hi '.$uname_db.'</a>';
+						if ($user_id!="") 
+						{
+							echo '<a style="text-decoration: none; color: #fff;" href="profile.php?uid='.$user_id.'">Hi '.$uname_db.'</a>';
 						}
-						else {
+						else 
+						{
 							echo '<a style="text-decoration: none; color: #fff;" href="login.php">LOG IN</a>';
 						}
 					 ?>
@@ -61,8 +66,9 @@ else {
 				</div>
 			</div>
 		</div>
+
 		<div class="home-welcome">
-			<div class="home-welcome-text" style="background-image: url(image/background.jpg); height: 380px; ">
+			<div class="home-welcome-text" style="background-image: url(images/background.jpg); height: 380px; ">
 				<div style="padding-top: 180px;">
 					<div style=" background-color: #dadbe6;">
 						<h1 style="margin: 0px;">Welcome To nita's online grocery</h1>
@@ -71,70 +77,45 @@ else {
 				</div>
 			</div>
 		</div>
-		<div class="home-prodlist">
-			<div>
-				<h3 style="text-align: center;">Products Category</h3>
-			</div>
-			<div style="padding: 20px 30px; width: 85%; margin: 0 auto;">
-				<ul style="float: left;">
-					<li style="float: left; padding: 25px;">
-						<div class="home-prodlist-img"><a href="OurProducts/NoodlesCanned.php">
-							<img src="./image/product/noodles/n.jpg" class="home-prodlist-imgi">
-							</a>
-						</div>
-					</li>
-				</ul>
-				<ul style="float: left;">
-					<li style="float: left; padding: 25px;">
-						<div class="home-prodlist-img"><a href="OurProducts/Snacks.php">
-							<img src="./image/product/snack/sn.jpg" class="home-prodlist-imgi">
-							</a>
-						</div>
-					</li>
-				</ul>
-				<ul style="float: left;">
-					<li style="float: left; padding: 25px;">
-						<div class="home-prodlist-img"><a href="OurProducts/Sweets.php">
-							<img src="./image/product/sweet/s.jpg" class="home-prodlist-imgi"></a>
-						</div>
-					</li>
-				</ul>
-				<ul style="float: left;">
-					<li style="float: left; padding: 25px;">
-						<div class="home-prodlist-img"><a href="OurProducts/Hygene.php">
-							<img src="./image/product/hygiene/hy.jpg" class="home-prodlist-imgi"></a>
-						</div>
-					</li>
-				</ul>
-				<ul style="float: left;">
-					<li style="float: left; padding: 25px;">
-						<div class="home-prodlist-img"><a href="OurProducts/Shampoo.php">
-							<img src="./image/product/shampoo/pall.jpg" class="home-prodlist-imgi"></a>
-						</div>
-					</li>
-				</ul>
-				<ul style="float: left;">
-					<li style="float: left; padding: 25px;">
-						<div class="home-prodlist-img"><a href="OurProducts/Soap&Detergent.php">
-							<img src="./image/product/soap/sp.jpg" class="home-prodlist-imgi"></a>
-						</div>
-					</li>
-				</ul>
-				<ul style="float: left;">
-					<li style="float: left; padding: 25px;">
-						<div class="home-prodlist-img"><a href="OurProducts/Drinks.php">
-							<img src="./image/product/drink/dr.jpg" class="home-prodlist-imgi"></a>
-						</div>
-					</li>
-				</ul>
-				<ul style="float: left;">
-					<li style="float: left; padding: 25px;">
-						<div class="home-prodlist-img"><a href="OurProducts/Seasonings.php">
-							<img src="./image/product/seasoning/cond.jpg" class="home-prodlist-imgi"></a>
-						</div>
-					</li>
-				</ul>
-			</div>			
+
+		<div class="slideshow-container">
+			
+			<?php
+				$run = mysqli_query($con, "SELECT * FROM banners ORDER BY banner_id DESC");
+
+				while ($banners = mysqli_fetch_assoc($run)) 
+				{ 
+					echo 
+					'
+					<div class="mySlides fade">
+						<div class="numbertext">'.$banners['banner_id'].'</div>
+						<a href="'.$banners['redirect'].'" >
+							<img src="'.$banners['image'].'" style="height: 75px; width: 130px;" alt="'.$banners['image'].'">
+						</a>
+					</div>
+					';
+				}
+			?>
+
+			<!-- Next and previous buttons -->
+			<a class="prev" onclick="plusSlides(-1)">&#10094;</a>
+			<a class="next" onclick="plusSlides(1)">&#10095;</a>
+		</div>
+		<br>
+
+		<!-- The dots/circles -->
+		<div style="text-align:center">
+			<?php
+				$run = mysqli_query($con, "SELECT * FROM banners ORDER BY banner_id DESC");
+
+				$count = 1;
+				while ($banners = mysqli_fetch_assoc($run)) 
+				{
+					echo '<span class="dot" onclick="currentSlide('.$count.')"></span>';
+					$count +=1;
+				}
+				
+			?>
 		</div>
 	</body>
 </html>
